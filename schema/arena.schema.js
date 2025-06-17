@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const arenaSchema = new mongoose.Schema({
     title: { type: String, minLength: 5 },
-    aurthor: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     guest: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     topics: [{type:String}],
     slug: { type: String },

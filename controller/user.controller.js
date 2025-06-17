@@ -4,16 +4,41 @@ const { User } = require("../schema/user.schema");
 const bcrypt = require("bcrypt");
 
 const getUserController = async (req, res) => {
+    let { page = 1, limit = 10, search = "" } = req.query || {};
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
+    const query = {};
+    if (search) {
+        query.$or = [
+            { fullName: { $regex: search, $options: "i" } },
+            { username: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+        ]
+    }
+
     try {
-        const findData = await User.find().select("-password -__v");
-        const countData = await User.countDocuments();
-        return res.status(200).json({ status: true, message: "success", total: countData, data: findData });
+        let findQuery = query;
+        if (req["rootId"] && req["rootUser"]?.role === "user") {
+            findQuery = { ...findQuery, _id: req["rootId"] }
+        }
+        const [findData, countData] = await Promise.all([
+            User.find(findQuery).select("-password -__v").skip(skip).limit(limit).sort({ createdAt: -1 }),
+            User.countDocuments()
+        ]);
+
+        return res.status(200).json({
+            status: true, message: "success", total: countData,
+            totalPages: Math.ceil(countData / limit),
+            data: findData
+        });
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
 const getByIdUserController = async (req, res) => {
     try {
         const { id } = req.params;
+        if(req["rootId"]&& req["rootUser"]?.role==="user"&& id!== req["rootId"] ) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id).select("-password -__v");
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
         return res.status(200).json({ status: true, message: "success", data: findData });
@@ -22,8 +47,8 @@ const getByIdUserController = async (req, res) => {
 };
 
 const postUserController = async (req, res) => {
-        let { username, password, fullName,email } = req.body || {};
-        if (!username || !password || !fullName || !email) return res.status(406).json({ status: false, message: `failed, username, fullName, email and password is required` });
+    let { username, password, fullName, email } = req.body || {};
+    if (!username || !password || !fullName || !email) return res.status(406).json({ status: false, message: `failed, username, fullName, email and password is required` });
     try {
         const findData = await User.findOne({ username });
         if (findData) return res.status(406).json({ status: false, message: `failed, username is already registred` });
@@ -33,24 +58,25 @@ const postUserController = async (req, res) => {
         const otp = Math.floor(1000 + Math.random() * 9000);
         const expiresIn = Date.now() + 5 * 60 * 1000;
         await Otp.create({
-                    otp:otp,
-                    expiresIn: expiresIn,
-                    type:"emailverification",
-                    email:email,
-                    user:saveData._id
+            otp: otp,
+            expiresIn: expiresIn,
+            type: "emailverification",
+            email: email,
+            user: saveData._id
         });
         sendTemplateEmail({
-            data : {fullName,expiryMinutes: Math.ceil((expiresIn - Date.now()) / (1000 * 60)) ,otp,email},
-            subject:"Account Verification",
-            template : "otp"
+            data: { fullName, expiryMinutes: Math.ceil((expiresIn - Date.now()) / (1000 * 60)), otp, email },
+            subject: "Account Verification",
+            template: "otp"
         })
-        return res.status(200).json({ status: true, message: "success", data: saveData });
+        return res.status(201).json({ status: true, message: "success", data: saveData });
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
 const putUserController = async (req, res) => {
     try {
         const { id } = req.params;
+        if(req["rootId"]&& req["rootUser"]?.role==="user"&& id!== req["rootId"] ) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id);
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
         if (req.body.password) req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -62,7 +88,9 @@ const putUserController = async (req, res) => {
 };
 const patchUserController = async (req, res) => {
     try {
+        
         const { id } = req.params;
+        if(req["rootId"]&& req["rootUser"]?.role==="user"&& id!== req["rootId"] ) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id);
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
         if (req.body.password) req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -75,6 +103,7 @@ const patchUserController = async (req, res) => {
 const deleteUserController = async (req, res) => {
     try {
         const { id } = req.params;
+        if(req["rootId"]&& req["rootUser"]?.role==="user"&& id!== req["rootId"] ) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id);
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
         let deleteResponse = await User.findByIdAndDelete(id);

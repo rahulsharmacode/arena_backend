@@ -35,10 +35,10 @@ userRouter.route('/user')
   .get(getUserController)
   .post(postUserController);
 userRouter.route('/user/:id')
-  .get(getByIdUserController)
-  .put(putUserController)
-  .patch(patchUserController)
-  .delete(deleteUserController);
+  .get(auth,getByIdUserController)
+  .put(auth,putUserController)
+  .patch(auth,patchUserController)
+  .delete(auth,deleteUserController);
 
   // ============================ arena routes ============================ //
 userRouter.route('/arena')

@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+
 const getRequired = (data, match) => {
     const requiredFields = ['username', 'password'];
     const missing = requiredFields.filter(field => !req.body[field]);
@@ -14,6 +16,9 @@ const getUserGroupedRoom = (data) => {
 }
 
 
+const getObjectId = (id) => {return mongoose.Types.ObjectId(id)}
+
 module.exports ={
-    getUserGroupedRoom
+    getUserGroupedRoom,
+    getObjectId
 }
