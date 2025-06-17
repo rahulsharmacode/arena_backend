@@ -58,3 +58,5 @@
 ::1 - PUT /api/v1/arena/68518c7edf7082531426b1fc 500 27 - 17.326 ms
 ::1 - PUT /api/v1/arena/68518c7edf7082531426b1fc 500 27 - 19.385 ms
 ::1 - PUT /api/v1/arena/68518c7edf7082531426b1fc 404 51 - 17.564 ms
+::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 500 49 - 0.742 ms
+::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 500 48 - 5.478 ms

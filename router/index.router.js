@@ -11,6 +11,7 @@ const { getUserController,
 const { loginController, forgetController, verifyOtpController, resendOtpController, changePasswordController } = require("../controller/auth.controller");
 const { auth } = require("../middelware/auth.middelware");
 const { getArenaController, postArenaController, getByIdArenaController, putArenaController, patchArenaController, deleteArenaController } = require("../controller/arena.controller");
+const { likeArenaController } = require("../controller/areanareact.controller");
 
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
@@ -49,6 +50,10 @@ userRouter.route('/arena/:id')
   .put(auth,putArenaController)
   .patch(auth,patchArenaController)
   .delete(auth,deleteArenaController);
+
+  // ============================ arena like/unlike/views ============================ //
+userRouter.route('/arena/like/:id')
+  .get(auth,likeArenaController)
 
 
 module.exports = {

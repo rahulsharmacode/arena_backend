@@ -45,3 +45,12 @@
 ::1 - PUT /api/v1/arena/68518ce0df7082531426b212 200 451 - 28.928 ms
 ::1 - POST /api/v1/arena 200 453 - 26.552 ms
 ::1 - POST /api/v1/arena 200 453 - 11.203 ms
+::1 - POST /api/v1/arena 201 453 - 59.408 ms
+::1 - GET /api/v1/arena?page=1&limit=3&search=It 200 1302 - 17.348 ms
+::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 201 35 - 25.220 ms
+::1 - GET /api/v1/arena?page=1&limit=3&search=It 200 1328 - 6.132 ms
+::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 204 - - 14.139 ms
+::1 - GET /api/v1/arena?page=1&limit=3&search=It 200 1302 - 3.639 ms
+::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 201 35 - 5.343 ms
+::1 - GET /api/v1/arena?page=1&limit=3&search=It 200 1328 - 3.121 ms
+::1 - GET /api/v1/arena?page=1&limit=3&search=It 200 1362 - 23.621 ms

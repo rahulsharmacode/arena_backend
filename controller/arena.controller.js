@@ -25,7 +25,7 @@ const getArenaController = async (req, res) => {
     }
 
     const [findData, countData] = await Promise.all([
-      Arena.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      Arena.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("like","fullName image"),
       Arena.countDocuments(findQuery)
     ]);
 
