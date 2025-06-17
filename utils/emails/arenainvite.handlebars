@@ -1,0 +1,78 @@
+<h1 style="color: #333; margin-bottom: 20px;">
+    🎉 You're Invited to a Talk on Arena!
+</h1>
+
+<p style="font-size: 16px; margin-bottom: 20px;">
+    Get ready for an insightful discussion! You've been invited to a talk titled **"{{talkTitle}}"** featuring **{{speakerName}}** on Arena.
+</p>
+
+<div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #8e44ad;">
+    <h3 style="color: #8e44ad; margin: 0 0 15px 0;">🎙️ Talk Details</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555; width: 30%;">Talk Title:</td>
+            <td style="padding: 8px 0; color: #333;">{{talkTitle}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Speaker:</td>
+            <td style="padding: 8px 0; color: #333;">{{speakerName}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Date:</td>
+            <td style="padding: 8px 0; color: #333;">{{talkDate}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Time:</td>
+            <td style="padding: 8px 0; color: #333;">{{talkTime}} {{timeZone}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Topics:</td>
+            <td style="padding: 8px 0; color: #333;">
+                {{#each topics}}
+                    <span style="background: #e0e0e0; color: #555; padding: 4px 10px; border-radius: 15px; font-size: 12px; margin-right: 5px; display: inline-block;">
+                        {{this}}
+                    </span>
+                {{/each}}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<h3 style="color: #2c3e50; margin: 30px 0 15px 0;">🚀 What to Expect</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+    <div style="flex: 1; min-width: 200px; background: #e8f4fd; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">🧠</div>
+        <h4 style="color: #667eea; margin: 0 0 10px 0;">Engaging Content</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">Dive deep into "software" and "technologies" related discussions.</p>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: #fff3cd; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">💡</div>
+        <h4 style="color: #856404; margin: 0 0 10px 0;">Interactive Q&A</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">Ask questions and get answers directly from the speaker.</p>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: #d1ecf1; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">🌐</div>
+        <h4 style="color: #0c5460; margin: 0 0 10px 0;">Connect & Network</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">Meet and interact with other like-minded individuals.</p>
+    </div>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{talkUrl}}" style="background: #8e44ad; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 16px;">
+        Join the Talk on Arena
+    </a>
+</div>
+
+<div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin-top: 20px;">
+    <h4 style="color: #667eea; margin: 0 0 15px 0;">🔔 Don't Miss Out!</h4>
+    <p style="margin: 0 0 15px 0; color: #555;">
+        Mark your calendar and be sure to join us for this exciting event. We look forward to seeing you there!
+    </p>
+    <p style="margin: 0; color: #666; font-size: 14px;">
+        You can find more upcoming talks and events at {{arenaUrl}}
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center;">
+    This is an automated invitation. Please do not reply to this email.
+</p>

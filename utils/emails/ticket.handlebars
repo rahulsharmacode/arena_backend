@@ -1,0 +1,78 @@
+<h1 style="color: #333; margin-bottom: 20px;">
+    🎫 Support Ticket <span class="highlight">#{{ticketId}}</span>
+</h1>
+
+<p style="font-size: 16px; margin-bottom: 20px;">
+    Thank you for contacting Indreni Chat support! We've received your request and our team is ready to help you.
+</p>
+
+<div style="background: #f8f9fa; padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #28a745;">
+    <h3 style="color: #28a745; margin: 0 0 15px 0;">📋 Ticket Details</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555; width: 30%;">Ticket ID:</td>
+            <td style="padding: 8px 0; color: #333;">#{{ticketId}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Subject:</td>
+            <td style="padding: 8px 0; color: #333;">{{subject}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Status:</td>
+            <td style="padding: 8px 0;">
+                <span style="background: #28a745; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                    {{status}}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Priority:</td>
+            <td style="padding: 8px 0;">
+                <span style="background: #dc3545; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                    {{priority}}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; font-weight: bold; color: #555;">Created:</td>
+            <td style="padding: 8px 0; color: #333;">{{formatDate}}</td>
+        </tr>
+    </table>
+</div>
+
+<h3 style="color: #ff6b6b; margin: 30px 0 15px 0;">⚡ What happens next?</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+    <div style="flex: 1; min-width: 200px; background: #e8f4fd; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">1️⃣</div>
+        <h4 style="color: #667eea; margin: 0 0 10px 0;">Review</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">Our team reviews your ticket within 2 hours</p>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: #fff3cd; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">2️⃣</div>
+        <h4 style="color: #856404; margin: 0 0 10px 0;">Investigate</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">We investigate and prepare a solution</p>
+    </div>
+    <div style="flex: 1; min-width: 200px; background: #d1ecf1; padding: 20px; border-radius: 10px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">3️⃣</div>
+        <h4 style="color: #0c5460; margin: 0 0 10px 0;">Resolve</h4>
+        <p style="margin: 0; font-size: 14px; color: #555;">We provide a solution and follow up</p>
+    </div>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{supportUrl}}/ticket/{{ticketId}}" class="btn">View Ticket Details</a>
+</div>
+
+<div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin-top: 20px;">
+    <h4 style="color: #667eea; margin: 0 0 15px 0;">💬 Need to add more information?</h4>
+    <p style="margin: 0 0 15px 0; color: #555;">
+        Simply reply to this email with additional details. All replies will be automatically added to your ticket.
+    </p>
+    <p style="margin: 0; color: #666; font-size: 14px;">
+        <strong>Response Time:</strong> High priority tickets are typically resolved within 4-6 hours.
+    </p>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center;">
+    Keep this email for your records. You can always check your ticket status at {{supportUrl}}
+</p>
