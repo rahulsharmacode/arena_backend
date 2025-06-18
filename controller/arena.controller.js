@@ -21,11 +21,14 @@ const getArenaController = async (req, res) => {
     let findQuery = query;
 
     if (req["rootId"] && req["rootUser"]?.role === "user") {
-      findQuery = { ...query, _id: req["rootId"] };
+      findQuery = { ...query, author: req["rootId"] };
     }
 
     const [findData, countData] = await Promise.all([
-      Arena.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("like","fullName image"),
+      Arena.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 })
+      .populate("author","fullName image")
+      .populate("guest","fullName image")
+      .populate("like","fullName image"),
       Arena.countDocuments(findQuery)
     ]);
 

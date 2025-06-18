@@ -60,3 +60,6 @@
 ::1 - PUT /api/v1/arena/68518c7edf7082531426b1fc 404 51 - 17.564 ms
 ::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 500 49 - 0.742 ms
 ::1 - GET /api/v1/arena/like/685196e48ce5518ecb18aaa5 500 48 - 5.478 ms
+::1 - POST /api/v1/user 500 372 - 83.280 ms
+::1 - POST /api/v1/auth/verifyotp 404 49 - 8.211 ms
+::1 - POST /api/v1/auth/verifyotp 404 70 - 3.214 ms

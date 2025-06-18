@@ -17,15 +17,11 @@ const { likeArenaController } = require("../controller/areanareact.controller");
 userRouter.route('/auth/login')
   .post(loginController);
 userRouter.route('/auth/register')
-  .post((req, res) => {
-
-  })
+  .post(postUserController);
 userRouter.route('/auth/forgetpassword')
   .post(forgetController)
-
 userRouter.route('/auth/verifyotp')
   .post(verifyOtpController)
-
 userRouter.route('/auth/resendotp')
   .post(resendOtpController)
 userRouter.route('/auth/changepassword')
@@ -36,24 +32,24 @@ userRouter.route('/user')
   .get(getUserController)
   .post(postUserController);
 userRouter.route('/user/:id')
-  .get(auth,getByIdUserController)
-  .put(auth,putUserController)
-  .patch(auth,patchUserController)
-  .delete(auth,deleteUserController);
+  .get(auth, getByIdUserController)
+  .put(auth, putUserController)
+  .patch(auth, patchUserController)
+  .delete(auth, deleteUserController);
 
-  // ============================ arena routes ============================ //
+// ============================ arena routes ============================ //
 userRouter.route('/arena')
-  .get(getArenaController)
-  .post(auth,postArenaController);
+  .get(auth, getArenaController)
+  .post(auth, postArenaController);
 userRouter.route('/arena/:id')
   .get(getByIdArenaController)
-  .put(auth,putArenaController)
-  .patch(auth,patchArenaController)
-  .delete(auth,deleteArenaController);
+  .put(auth, putArenaController)
+  .patch(auth, patchArenaController)
+  .delete(auth, deleteArenaController);
 
-  // ============================ arena like/unlike/views ============================ //
+// ============================ arena like/unlike/views ============================ //
 userRouter.route('/arena/like/:id')
-  .get(auth,likeArenaController)
+  .get(auth, likeArenaController)
 
 
 module.exports = {
