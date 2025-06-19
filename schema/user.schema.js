@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema({
     isFacebookVerified: {type:Boolean,default:false},
     isInstagramVerified: {type:Boolean,default:false},
     isYoutubeVerified: {type:Boolean,default:false},
+    isGoogleVerified: {type:Boolean,default:false},
+    isDiscordVerified: {type:Boolean,default:false},
     isTiktokVerified: {type:Boolean,default:false},
 
     bio:{type:String},

@@ -17,21 +17,32 @@ const getUserController = async (req, res) => {
         ]
     }
 
+    const isAdmin = req["rootUser"]?.role === "admin";
+    const selectFields = isAdmin
+  ? "-password -__v" // Admin sees everything except password & __v
+  : "-password -__v -email -phone"; 
     try {
         let findQuery = query;
         if (req["rootId"] && req["rootUser"]?.role === "user") {
             findQuery = { ...findQuery, _id: req["rootId"] }
         }
         const [findData, countData] = await Promise.all([
-            User.find(findQuery).select("-password -__v").skip(skip).limit(limit).sort({ createdAt: -1 }),
-            User.countDocuments()
+            User.find(findQuery).select(selectFields).skip(skip).limit(limit).sort({ createdAt: -1 }),
+            User.countDocuments(findQuery)
         ]);
 
-        return res.status(200).json({
+        return res.status(200).json(req["rootUser"]?.role === "user" ? 
+
+            {
+            status: true, message: "success", 
+            data: findData[0]
+        } :
+        {
             status: true, message: "success", total: countData,
             totalPages: Math.ceil(countData / limit),
             data: findData
-        });
+        }
+        );
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
@@ -51,7 +62,7 @@ const postUserController = async (req, res) => {
     if (!username || !password || !fullName || !email) return res.status(406).json({ status: false, message: `failed, username, fullName, email and password is required` });
     try {
         const findData = await User.findOne({ username });
-        if (findData) return res.status(406).json({ status: false, message: `failed, username is already registred` });
+        if (findData) return res.status(403).json({ status: false, message: `failed, username is already registred` });
         req.body.password = await bcrypt.hash(password, 10);
         const saveData = await User.create(req.body);
         if (!saveData) return res.status(500).json({ status: false, message: `failed, someting went wrong!` });
@@ -79,12 +90,39 @@ const putUserController = async (req, res) => {
         if(req["rootId"]&& req["rootUser"]?.role==="user"&& id!== req["rootId"] ) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id);
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
-        if (req.body.password) req.body.password = await bcrypt.hash(req.body.password, 10);
+        if (req.body?.password) req.body.password = await bcrypt.hash(req.body.password, 10);
         Object.assign(findData, req.body);
         await findData.save();
         return res.status(200).json({ status: true, message: "success", data: findData });
     }
-    catch (err) { return res.status(500).json({ status: false, error: err }) };
+    catch (err) {
+    // Handle duplicate key error
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(409).json({
+        status: false,
+        message: `already exits ${field}`,
+        field,
+      });
+    }
+
+    // Mongoose validation errors
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({
+        status: false,
+        message: "Validation failed",
+        errors,
+      });
+    }
+
+    // Generic fallback
+    return res.status(500).json({
+      status: false,
+      message: "Server error",
+      error: err.message || err,
+    });
+  };
 };
 const patchUserController = async (req, res) => {
     try {
