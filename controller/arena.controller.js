@@ -147,11 +147,12 @@ const postArenaController = async (req, res) => {
 // };
 const putArenaController = async (req, res) => {
     try {
-        console.log("click ok")
         const { id } = req.params;
         const findData = await Arena.findById(id);
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
         if(req["rootId"]&& req["rootUser"]?.role==="user"&& !findData.author.equals(req["rootId"])) return res.status(401).json({ status: false, message: `failed, unauthorized` });
+      
+        
         Object.assign(findData, req.body);
         await findData.save();
         return res.status(200).json({ status: true, message: "success", data: findData });

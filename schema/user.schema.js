@@ -26,7 +26,12 @@ const userSchema = new mongoose.Schema({
       type:String,
       required: [true, 'full name is required'],
     },
-    image: {type:String},
+    image: {
+        s3Key :String,
+        s3Bucket :String,
+        uploadDate :Date,
+        originalFileName: String
+    },
     role : {type:String, enum: ['admin', 'moderator', 'user', 'bot', 'superadmin'], default : 'user'},
     status : {type:String},
     isBlocked: {type:Boolean,default:false},
@@ -39,6 +44,8 @@ const userSchema = new mongoose.Schema({
     isGoogleVerified: {type:Boolean,default:false},
     isDiscordVerified: {type:Boolean,default:false},
     isTiktokVerified: {type:Boolean,default:false},
+    isGithubVerified: {type:Boolean,default:false},
+
 
     bio:{type:String},
     mobileNumber:{type:String},

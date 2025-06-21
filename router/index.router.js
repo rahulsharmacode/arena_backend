@@ -13,7 +13,8 @@ const { auth } = require("../middelware/auth.middelware");
 const { getArenaController, postArenaController, getByIdArenaController, putArenaController, patchArenaController, deleteArenaController } = require("../controller/arena.controller");
 const { likeArenaController } = require("../controller/areanareact.controller");
 const passport = require("passport");
-
+const { linkedinLog, linkedinPreLog, twitterPreLog, twitterLog } = require("../helper/oauth.direct.function");
+const {upload} = require("../helper/s3.function");
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
   .post(loginController);
@@ -30,12 +31,12 @@ userRouter.route('/auth/changepassword')
 
 // ============================ user routes ============================ //
 userRouter.route('/user')
-  .get(auth,getUserController)
+  .get(auth, getUserController)
   .post(postUserController);
 userRouter.route('/user/:id')
   .get(auth, getByIdUserController)
-  .put(auth, putUserController)
-  .patch(auth, patchUserController)
+  .put(auth,upload.single('image'), putUserController)
+  .patch(auth,upload.single('image'), patchUserController)
   .delete(auth, deleteUserController);
 
 // ============================ arena routes ============================ //
@@ -53,7 +54,7 @@ userRouter.route('/arena/like/:id')
   .get(auth, likeArenaController)
 
 
-  // Routes
+// Routes
 userRouter.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 userRouter.get('/auth/google/callback',
@@ -64,19 +65,19 @@ userRouter.get('/auth/google/callback',
 );
 
 
-userRouter.get("/auth/x", passport.authenticate("twitter"));
-userRouter.get("/auth/x/callback", passport.authenticate("twitter", {
-  failureRedirect: "/login",
-  
-}), (req, res) => {
-     res.redirect('http://localhost:4000/home'); // frontend redirect
-});
+// userRouter.get("/auth/twitter", passport.authenticate("twitter"));
+// userRouter.get("/auth/twitter/callback", passport.authenticate("twitter", {
+//   failureRedirect: "/login",
+
+// }), (req, res) => {
+//      res.redirect('http://localhost:4000/home'); // frontend redirect
+// });
 
 
-userRouter.get("/auth/linkedin", passport.authenticate("linkedin"));
-userRouter.get("/auth/linkedin/callback", passport.authenticate("linkedin", {
+userRouter.get("/auth/facebook", passport.authenticate("facebook"));
+userRouter.get("/auth/facebook/callback", passport.authenticate("facebook", {
   failureRedirect: "/login",
-  
+
 }), (req, res) => {
      res.redirect('http://localhost:4000/home'); // frontend redirect
 });
@@ -84,12 +85,29 @@ userRouter.get("/auth/linkedin/callback", passport.authenticate("linkedin", {
 userRouter.get("/auth/discord", passport.authenticate("discord"));
 userRouter.get("/auth/discord/callback", passport.authenticate("discord", {
   failureRedirect: "/login",
-  
+
 }), (req, res) => {
-     res.redirect('http://localhost:4000/home'); // frontend redirect
+  res.redirect('http://localhost:4000/home'); // frontend redirect
+});
+
+userRouter.get("/auth/github", passport.authenticate("github"));
+userRouter.get("/auth/github/callback", passport.authenticate("github", {
+  failureRedirect: "/login",
+
+}), (req, res) => {
+  res.redirect('http://localhost:4000/home'); // frontend redirect
 });
 
 
+
+
+
+userRouter.get('/auth/twitter', twitterPreLog);
+userRouter.get('/auth/twitter/callback', twitterLog);
+
+
+userRouter.get('/auth/linkedin', linkedinPreLog);
+userRouter.get('/auth/linkedin/callback', linkedinLog);
 
 
 module.exports = {

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken")
 const { User } = require("../schema/user.schema");
 const { Otp } = require("../schema/otp.schema");
 const { sendTemplateEmail } = require("../helper/mail.function");
+const { generatePresignedUrl } = require("../helper/s3.function");
 
 
 const loginController = async (req,res) =>{
@@ -20,7 +21,8 @@ const loginController = async (req,res) =>{
                 username : findData.username
             },process.env.SECRET_KEY, {expiresIn:30000});
            
-         return res.status(200).json({ status: true, message: `success`,token,data:{_id:findData._id,email:findData.email,username:findData.username} });
+         let presignedImageURL = findData.image.s3Key ? await generatePresignedUrl(findData.image.s3Key) : ""
+         return res.status(200).json({ status: true, message: `success`,token,data:{_id:findData._id,email:findData.email,username:findData.username,fullName:findData.fullName,image:presignedImageURL} });
     }
     catch(err){
        return res.status(500).json({status:false,error:err})
