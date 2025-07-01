@@ -4,6 +4,7 @@ const { User } = require("../schema/user.schema");
 const { Category } = require("../schema/category.schema");
 
 const getArenaController = async (req, res) => {
+  console.log("🚀 ~ getArenaController ~ req:", req)
   let { page = 1, limit = 10, search = "" } = req.query;
   page = parseInt(page);
   limit = parseInt(limit);

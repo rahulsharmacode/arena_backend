@@ -89,8 +89,11 @@ const postUserController = async (req, res) => {
     let { username, password, fullName, email } = req.body || {};
     if (!username || !password || !fullName || !email) return res.status(406).json({ status: false, message: `failed, username, fullName, email and password is required` });
     try {
-        const findData = await User.findOne({ username });
-        if (findData) return res.status(403).json({ status: false, message: `failed, username is already registred` });
+        const findUsername = await User.findOne({ username });
+        if (findUsername) return res.status(403).json({ status: false, message: `failed, username is already registred` });
+        const findEmail = await User.findOne({ email });
+        if (findEmail) return res.status(403).json({ status: false, message: `failed, email is already registred` });
+
         req.body.password = await bcrypt.hash(password, 10);
         const saveData = await User.create(req.body);
         if (!saveData) return res.status(500).json({ status: false, message: `failed, someting went wrong!` });

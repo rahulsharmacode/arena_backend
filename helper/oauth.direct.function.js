@@ -73,7 +73,6 @@ const linkedinLog = async (req, res) => {
           // 'X-Restli-Protocol-Version': '2.0.0', // Often not needed for /userinfo but can be included for other v2 endpoints
         },
       });
-
       if (!userInfoResponse.ok) {
         const userInfoErrorData = await userInfoResponse.json();
         console.error('Failed to fetch LinkedIn user profile:', userInfoResponse.status, userInfoErrorData);
@@ -81,6 +80,7 @@ const linkedinLog = async (req, res) => {
       }
 
       userProfile = await userInfoResponse.json();
+      console.log("🚀 ~ linkedinLog ~ userProfile:", userProfile)
       const { access } = req?.cookies || {};
               if (access) {
                   const verifyToken = jwt.decode(access, process.env.SECRET_KEY);
@@ -122,7 +122,7 @@ const linkedinLog = async (req, res) => {
               }
 
 
-      res.redirect('http://localhost:4000/home'); // frontend redirect
+      res.redirect(`http://localhost:4000/profile?modal=update&ms=${Date.now()}`); // frontend redirect
     } catch (profileFetchError) {
       console.error('Error fetching LinkedIn user profile:', profileFetchError.message);
       res.redirect('/login?error=profile_fetch_failed');
@@ -153,111 +153,6 @@ const twitterPreLog = (req, res) => {
 
   res.redirect(authUrl);
 }
-
-// const twitterLog = async (req, res) => {
-//   const TWITTER_CLIENT_ID = 'MGlHRHNNSmxodHBiMW0tU2IxbG46MTpjaQ';
-//   const TWITTER_CLIENT_SECRET = 'e2AEic-n35w8AKhi1cmFdi0c2dcnPk4sio_6qDufc7fzQ-mjj1';
-//   const TWITTER_REDIRECT_URI = 'http://localhost:3000/api/v1/auth/twitter/callback';
-
-//   const { code, state, error, error_description } = req.query;
-
-//   // 1. Verify state and code_verifier
-//   if (!state || state !== req.session.twitterState) {
-//     console.error('CSRF attack detected or state mismatch.');
-//     return res.status(403).send('CSRF attack detected or state mismatch.');
-//   }
-//   const codeVerifier = req.session.twitterCodeVerifier;
-//   if (!codeVerifier) {
-//       console.error('PKCE code_verifier missing from session.');
-//       return res.status(400).send('PKCE code_verifier missing.');
-//   }
-//   delete req.session.twitterState; // Clear state after use
-//   delete req.session.twitterCodeVerifier; // Clear verifier after use
-
-//   if (error) {
-//     console.error('Twitter OAuth Error:', error, error_description);
-//     return res.redirect('/login?error=twitter_auth_failed');
-//   }
-
-//   try {
-//     // Construct Basic Authorization header for client_id and client_secret
-//     const credentials = Buffer.from(`${TWITTER_CLIENT_ID}:${TWITTER_CLIENT_SECRET}`).toString('base64');
-
-//     // 2. Exchange code for access token using fetch
-//     const tokenResponse = await fetch('https://api.twitter.com/2/oauth2/token', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/x-www-form-urlencoded',
-//         'Authorization': `Basic ${credentials}`, // IMPORTANT: Basic Auth header
-//       },
-//       body: new URLSearchParams({
-//         grant_type: 'authorization_code',
-//         code: code,
-//         client_id: TWITTER_CLIENT_ID, // Required again for PKCE flow
-//         redirect_uri: TWITTER_REDIRECT_URI,
-//         code_verifier: codeVerifier, // PKCE verifier
-//       }).toString(),
-//     });
-
-//     if (!tokenResponse.ok) {
-//       const errorData = await tokenResponse.json();
-//       console.error('Twitter token exchange failed:', tokenResponse.status, errorData);
-//       throw new Error(`Failed to exchange code for token: ${tokenResponse.statusText} - ${JSON.stringify(errorData)}`);
-//     }
-
-//     const { access_token, refresh_token, expires_in, scope, token_type } = await tokenResponse.json();
-//     console.log(access_token, refresh_token, expires_in, scope, token_type , "0000 twitter ----")
-//       const { access } = req?.cookies || {};
-//               if (access) {
-//                   const verifyToken = jwt.decode(access, process.env.SECRET_KEY);
-//                   if (verifyToken && verifyToken._id) {
-//                       userIdFromToken = verifyToken._id;
-
-
-//                           if (userIdFromToken) {
-//                 // Link linkdine to an existing user identified by the JWT
-//                 const userToLink = await User.findById(userIdFromToken);
-//                 if (userToLink) {
-//                     // Ensure `OAuth` schema can handle linking or merge into `User` schema
-//                     // This assumes `OAuth` is a separate model for linked accounts
-//                     const newOAuthEntry = new OAuth({
-//                         oAuthId: userProfile.sub||"",
-//                         name: userProfile.name || userProfile?.displayName || "", // linkdine uses 'username' for basic users, 'displayName' for others
-//                         email: userProfile.email,
-//                         user: userIdFromToken, // Link to the existing user
-//                     });
-//                     await newOAuthEntry.save();
-    
-//                     // Update the main User model to mark linkdine as verified/linked
-//                     await User.findByIdAndUpdate(userIdFromToken, {
-//                         $set: { isLinkedinVerified: true } // Assuming 'islinkdineVerified' in your User model
-//                     });
-//                     console.log("linkdine account linked to existing user.");
-//                 } else {
-//                     console.warn("JWT identified user not found in database for linking.");
-//                     // Fall through to create a new user if linking failed
-//                 }
-//             }
-
-
-//                   } else {
-//                       console.warn("JWT decoded but _id not found or token is invalid.");
-//                   }
-//               } else {
-//                   console.log("No 'access' cookie found. This might be a new login without prior session.");
-//               }
-
-
-
-
-//      res.redirect('http://localhost:4000/home'); // frontend redirect
-
-//   } catch (err) {
-//     console.error('Error during Twitter OAuth token exchange:', err.message);
-//     res.redirect('/login?error=token_exchange_failed');
-//   }
-// }
-
 const twitterLog = async (req, res) => {
   // IMPORTANT: Use environment variables for client ID and secret in production
   const TWITTER_CLIENT_ID = process.env.TWITTER_CLIENT_ACCESS;
@@ -362,13 +257,15 @@ const twitterLog = async (req, res) => {
       console.log("No 'access' cookie found. This might be a new login without prior session.");
     }
 
-    res.redirect('http://localhost:4000/home'); // frontend redirect
+    res.redirect(`http://localhost:4000/profile?modal=update&ms=${Date.now()}`); // frontend redirect
 
   } catch (err) {
     console.error('Error during Twitter OAuth flow:', err.message);
     res.redirect(`/login?error=${encodeURIComponent(err.message || 'twitter_oauth_failed')}`);
   }
 };
+
+
 
 
 

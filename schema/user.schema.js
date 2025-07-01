@@ -36,15 +36,14 @@ const userSchema = new mongoose.Schema({
     status : {type:String},
     isBlocked: {type:Boolean,default:false},
     isEmailVerified: {type:Boolean,default:false},
-    isLinkedinVerified: {type:Boolean,default:false},
-    isXVerified: {type:Boolean,default:false},
-    isFacebookVerified: {type:Boolean,default:false},
-    isInstagramVerified: {type:Boolean,default:false},
-    isYoutubeVerified: {type:Boolean,default:false},
-    isGoogleVerified: {type:Boolean,default:false},
-    isDiscordVerified: {type:Boolean,default:false},
-    isTiktokVerified: {type:Boolean,default:false},
-    isGithubVerified: {type:Boolean,default:false},
+
+    isLinkedinVerified: {type:String,default:null},
+    isXVerified: {type:String,default:null},
+    isFacebookVerified: {type:String,default:null},
+    isInstagramVerified: {type:String,default:null},
+    isYoutubeVerified: {type:String,default:null},
+    isTiktokVerified: {type:String,default:null},
+
 
 
     bio:{type:String},

@@ -18,7 +18,16 @@ const getUserGroupedRoom = (data) => {
 
 const getObjectId = (id) => {return mongoose.Types.ObjectId(id)}
 
+
+function normalizeProfileUrl(url) {
+  if (!/^https?:\/\//i.test(url)) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
 module.exports ={
     getUserGroupedRoom,
-    getObjectId
+    getObjectId,
+    normalizeProfileUrl
 }
