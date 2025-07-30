@@ -9,6 +9,8 @@ const {userRouter} = require("./router/index.router");
 const {accessLogger,errorLogger} = require("./helper/logger.function");
 const passport = require("passport");
 const cookieParser = require('cookie-parser');
+const { Server } = require("socket.io");
+const { socketHandler } = require("./socket/connection.socket");
 
 app.use(express.json());
 app.use(cors({
@@ -41,5 +43,12 @@ app.get("/", (req,res) => res.status(200).json({status:true,message:"server test
 /* server and socket */
 const server = http.createServer(app);
 
+
+const io = new Server(server, {
+    cors : {
+        origin : "*"
+    }
+});
+socketHandler(io);
 
 server.listen(process.env.PORT||3000 , ()=> console.log( `server running at port ${process.env.PORT}`));

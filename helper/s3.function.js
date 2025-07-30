@@ -94,8 +94,45 @@ async function generatePresignedUrl(s3Key) {
 }
 
 
+
+
+
+
+/*  upload blob  */
+
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+
+async function uploadBase64Image({ base64Data, filename, mimetype, folder = "images" }) {
+    const buffer = Buffer.from(base64Data.replace(/^data:.+;base64,/, ''), 'base64');
+
+    const s3Key = `${folder}/${Date.now()}-${filename}`;
+
+    const uploadParams = {
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: s3Key,
+        Body: buffer,
+        ContentEncoding: 'base64',
+        ContentType: mimetype,
+        // ACL: 'public-read', // or omit for private
+    };
+
+    try {
+        await s3Client.send(new PutObjectCommand(uploadParams));
+        return {
+            s3Key,
+            url: `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${s3Key}`
+        };
+    } catch (err) {
+        console.error("S3 Upload Error:", err);
+        throw new Error("Failed to upload image to S3");
+    }
+}
+
+
+
 module.exports = {
     upload,
     generatePresignedUrl,
-    s3Client // Export s3Client if needed elsewhere (e.g., for direct S3 operations)
+    s3Client, // Export s3Client if needed elsewhere (e.g., for direct S3 operations)
+    uploadBase64Image
 };

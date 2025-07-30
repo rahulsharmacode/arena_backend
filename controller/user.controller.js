@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const { sendTemplateEmail } = require("../helper/mail.function");
 const { generatePresignedUrl } = require("../helper/s3.function");
 const { Otp } = require("../schema/otp.schema");
@@ -64,11 +65,91 @@ const getUserController = async (req, res) => {
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
+const getUsersController = async (req, res) => {
+    let { page = 1, limit = 10, search = "" } = req.query || {};
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
+    const query = {};
+    if (search) {
+        query.$or = [
+            { fullName: { $regex: search, $options: "i" } },
+            { username: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+        ]
+    }
+
+    const isAdmin = req["rootUser"]?.role === "admin";
+    const selectFields = isAdmin
+        ? "-password -__v" // Admin sees everything except password & __v
+        : "-password -__v";
+    try {
+        let findQuery = query;
+        if (req["rootId"] && req["rootUser"]?.role === "user") {
+            findQuery = { ...findQuery }
+        }
+
+        const [findData, countData] = await Promise.all([
+            User.find(findQuery).select(selectFields).skip(skip).limit(limit).sort({ createdAt: -1 }),
+            User.countDocuments(findQuery)
+        ]);
+
+        const usersWithImages = await Promise.all(findData.map(async (user) => {
+            let presignedProfileURL = null;
+            // If user is a Mongoose document, use .toObject() for spreading
+            const userData = user.toObject();
+
+            if (userData.image && userData.image.s3Key) {
+                try {
+                    presignedProfileURL = await generatePresignedUrl(userData.image.s3Key);
+                } catch (error) {
+                    console.error('Error fetching presigned URL for user:', userData._id, error);
+                    presignedProfileURL = 'Error generating image URL.';
+                }
+            }
+            return { ...userData, image: presignedProfileURL };
+        }));
+
+
+        return res.status(200).json({
+                status: true, message: "success", total: countData,
+                totalPages: Math.ceil(countData / limit),
+                data: usersWithImages
+            }
+        );
+    }
+    catch (err) { return res.status(500).json({ status: false, error: err }) };
+};
 const getByIdUserController = async (req, res) => {
     try {
         const { id } = req.params;
+         if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ status: false, message: "Invalid user ID format" });
+    }
+
+
         if (req["rootId"] && req["rootUser"]?.role === "user" && id !== req["rootId"]) return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id).select("-password -__v");
+        if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
+
+        let presignedProfileURL = null;
+        if (findData.image && findData.image.s3Key) {
+            try {
+                presignedProfileURL = await generatePresignedUrl(findData.image.s3Key);
+            } catch (error) {
+                console.error('Error fetching presigned URL for user:', userId, error);
+                presignedProfileURL = 'Error generating image URL.';
+            }
+        }
+        return res.status(200).json({ status: true, message: "success", data: { ...findData.toObject(), image: presignedProfileURL } });
+    }
+    catch (err) { return res.status(500).json({ status: false, error: err }) };
+};
+const getByUsernameUserController = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        const findData = await User.findOne({username}).select("-password -__v");
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
 
         let presignedProfileURL = null;
@@ -205,7 +286,9 @@ const deleteUserController = async (req, res) => {
 
 module.exports = {
     getUserController,
+    getUsersController,
     getByIdUserController,
+    getByUsernameUserController,
     postUserController,
     putUserController,
     patchUserController,

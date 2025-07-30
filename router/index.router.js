@@ -8,16 +8,20 @@ const { getUserController,
   putUserController,
   patchUserController,
   deleteUserController,
-  getByIdUserController } = require("../controller/user.controller");
+  getByIdUserController, 
+  getUsersController,
+  getByUsernameUserController} = require("../controller/user.controller");
 
 const { loginController, forgetController, verifyOtpController, resendOtpController, changePasswordController } = require("../controller/auth.controller");
 const { auth } = require("../middelware/auth.middelware");
-const { getArenaController, postArenaController, getByIdArenaController, putArenaController, patchArenaController, deleteArenaController } = require("../controller/arena.controller");
+const { getArenaController, postArenaController, getByIdArenaController, putArenaController, patchArenaController, deleteArenaController, patchArenaGuestController, patchArenaBookmarksController, patchArenaLikeController, postArenaNewConversationController } = require("../controller/arena.controller");
 const { likeArenaController } = require("../controller/areanareact.controller");
 const passport = require("passport");
 const { linkedinLog, linkedinPreLog, twitterPreLog, twitterLog } = require("../helper/oauth.direct.function");
 const {upload} = require("../helper/s3.function");
 const { verifyImage } = require("../controller/tesseract.controller");
+const { getArenaMessagesController } = require("../controller/messages.controller");
+const { getFeedController } = require("../controller/feeds.controller");
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
   .post(loginController);
@@ -36,25 +40,52 @@ userRouter.route('/auth/changepassword')
 userRouter.route('/user')
   .get(auth, getUserController)
   .post(postUserController);
+  userRouter.route('/users')
+  .get(auth, getUsersController)
 userRouter.route('/user/:id')
   .get(auth, getByIdUserController)
   .put(auth,upload.single('image'), putUserController)
   .patch(auth,upload.single('image'), patchUserController)
   .delete(auth, deleteUserController);
 
+userRouter.route('/user/profile/:username')
+  .get(auth, getByUsernameUserController)
+
 // ============================ arena routes ============================ //
 userRouter.route('/arena')
   .get(auth, getArenaController)
   .post(auth, postArenaController);
+  userRouter.route('/arena/new-conversation')
+  .post(auth, postArenaNewConversationController);
 userRouter.route('/arena/:id')
   .get(getByIdArenaController)
   .put(auth, putArenaController)
   .patch(auth, patchArenaController)
   .delete(auth, deleteArenaController);
+  userRouter.route('/arena/guest-accept/:id')
+  .patch(auth, patchArenaGuestController)
+
+  userRouter.route('/arena/bookmarks/:id')
+  .patch(auth, patchArenaBookmarksController)
+
+    userRouter.route('/arena/like/:id')
+  .patch(auth, patchArenaLikeController)
+
+
+// ============================ home feeds routes ============================ //
+userRouter.route('/feeds')
+  .get(auth, getFeedController)
+
+
+  // ============================ messages routes ============================ //
+userRouter.route('/arena/messages/:roomId')
+  .get(auth, getArenaMessagesController);
+
+
 
 // ============================ arena like/unlike/views ============================ //
-userRouter.route('/arena/like/:id')
-  .get(auth, likeArenaController)
+userRouter.route('/arena/likeby/:postId')
+  .get( likeArenaController)
 
 
 // Routes
@@ -71,14 +102,6 @@ userRouter.get('/auth/google/callback',
 
 const storage = multer.memoryStorage(); // Store files in memory as buffers
 const upload2 = multer({ storage: storage });
-
-// userRouter.get("/auth/twitter", passport.authenticate("twitter"));
-// userRouter.get("/auth/twitter/callback", passport.authenticate("twitter", {
-//   failureRedirect: "/login",
-
-// }), (req, res) => {
-//      res.redirect(`http://localhost:4000/profile?modal=update&ms=${Date.now()}`); // frontend redirect
-// });
 
 
 userRouter.get("/auth/facebook", passport.authenticate("facebook"));
@@ -108,14 +131,11 @@ userRouter.get("/auth/github/callback", passport.authenticate("github", {
 
 
 
-
 userRouter.get('/auth/twitter', twitterPreLog);
 userRouter.get('/auth/twitter/callback', twitterLog);
 
-
 userRouter.get('/auth/linkedin', linkedinPreLog);
 userRouter.get('/auth/linkedin/callback', linkedinLog);
-
 
 userRouter.post('/verify-image',auth, upload2.single('screenshot'), verifyImage);
 
