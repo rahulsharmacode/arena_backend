@@ -27,7 +27,7 @@ const arenaSchema = new mongoose.Schema({
     paymentMode : {type:String,enums:["stripe","paypal"],default:"stripe"},
     paymentStatus:{type:String,enums:['pending' , 'authorized' , 'cancelled' , 'completed'],default: null},
     isEventClosed : {type:Boolean,default:false},
-    eventStatus:{type:String,enums:["pending","negotation","open","closed"],default:"pending"},
+    eventStatus:{type:String,enums:["pending","negotation","open","closed","decline"],default:"pending"},
     view: { type: Number, default: 0 },
     like: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
 
@@ -54,8 +54,19 @@ const likedSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
+const commentSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "users", index: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false },
+    content : {type:String, required: [true, 'comment content is required'],}
+}, {
+    timestamps: true
+});
+
 const Arena = mongoose.model("arenas", arenaSchema);
 const Bookmarks = mongoose.model("bookmarks", bookmarksSchema);
 const Liked = mongoose.model("likes", likedSchema);
+const Comment = mongoose.model("comments", commentSchema);
 
-module.exports = { Arena,Bookmarks,Liked };
+
+module.exports = { Arena,Bookmarks,Liked,Comment };

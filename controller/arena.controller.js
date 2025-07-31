@@ -1,5 +1,5 @@
 const { sendTemplateEmail } = require("../helper/mail.function");
-const { Arena, Bookmarks, Liked } = require("../schema/arena.schema");
+const { Arena, Bookmarks, Liked, Comment } = require("../schema/arena.schema");
 const { User } = require("../schema/user.schema");
 const { Category } = require("../schema/category.schema");
 const { generatePresignedUrl } = require("../helper/s3.function");
@@ -50,7 +50,7 @@ if (req["rootId"] && req["rootUser"]?.role === "user") {
         { guest: req["rootId"] }
       ]
     },
-    { isNewDiscussion: null } 
+    { isNewDiscussion: false } 
   ];
 }
 
@@ -293,6 +293,8 @@ const patchArenaLikeController = async (req, res) => {
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
 
+
+
 const patchArenaGuestController = async (req, res) => {
     try {
         const { id } = req.params;
@@ -378,5 +380,5 @@ module.exports = {
     patchArenaGuestController,
     patchArenaBookmarksController,
     patchArenaLikeController,
-    postArenaNewConversationController
+    postArenaNewConversationController,
 };

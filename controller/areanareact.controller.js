@@ -1,7 +1,5 @@
 const { sendTemplateEmail } = require("../helper/mail.function");
-const { Arena, Liked } = require("../schema/arena.schema");
-const { User } = require("../schema/user.schema");
-const { Category } = require("../schema/category.schema");
+const {Liked } = require("../schema/arena.schema");
 const { generatePresignedUrl } = require("../helper/s3.function");
 
 const likeArenaController = async (req, res) => {
@@ -21,8 +19,6 @@ const likeArenaController = async (req, res) => {
         ,
         Liked.countDocuments({post:postId})
       ]);
-      
-      console.log("🚀 ~ likeArenaController ~ findData:", findData)
 
 const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
   const arena = arenaDoc.toObject(); // convert to plain JS object

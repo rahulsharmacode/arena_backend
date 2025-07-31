@@ -21,7 +21,8 @@ const { linkedinLog, linkedinPreLog, twitterPreLog, twitterLog } = require("../h
 const {upload} = require("../helper/s3.function");
 const { verifyImage } = require("../controller/tesseract.controller");
 const { getArenaMessagesController } = require("../controller/messages.controller");
-const { getFeedController } = require("../controller/feeds.controller");
+const { getFeedController, getFeedUserController } = require("../controller/feeds.controller");
+const { postArenaCommentController, patchArenaCommentController, deleteArenaCommentController, getArenaCommentController } = require("../controller/comment.controller");
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
   .post(loginController);
@@ -71,10 +72,21 @@ userRouter.route('/arena/:id')
     userRouter.route('/arena/like/:id')
   .patch(auth, patchArenaLikeController)
 
+      
+// ============================ arena comments ============================ //
+  userRouter.route('/arena/comment/:id')
+  .get(auth, getArenaCommentController)
+  .post(auth, postArenaCommentController)
+  userRouter.route('/arena/comment/:id')
+  .patch(auth, patchArenaCommentController)
+  .delete(auth, deleteArenaCommentController)
+
 
 // ============================ home feeds routes ============================ //
 userRouter.route('/feeds')
   .get(auth, getFeedController)
+  userRouter.route('/feeds/user/:id')
+  .get(auth, getFeedUserController)
 
 
   // ============================ messages routes ============================ //
