@@ -23,6 +23,7 @@ const { verifyImage } = require("../controller/tesseract.controller");
 const { getArenaMessagesController } = require("../controller/messages.controller");
 const { getFeedController, getFeedUserController } = require("../controller/feeds.controller");
 const { postArenaCommentController, patchArenaCommentController, deleteArenaCommentController, getArenaCommentController } = require("../controller/comment.controller");
+const { getNotificationController, patchNotificationController, deleteNotificationController, patchNotificationReadAllController } = require("../controller/notification.controller");
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
   .post(loginController);
@@ -93,6 +94,15 @@ userRouter.route('/feeds')
 userRouter.route('/arena/messages/:roomId')
   .get(auth, getArenaMessagesController);
 
+
+  // ============================ arena notification ============================ //
+userRouter.route('/notification')
+  .get(auth, getNotificationController);
+userRouter.route('/notification/:id')
+  .patch(auth, patchNotificationController)
+  .delete(auth, deleteNotificationController);
+userRouter.route('/notification/mark-all-read')
+  .post(auth, patchNotificationReadAllController)
 
 
 // ============================ arena like/unlike/views ============================ //

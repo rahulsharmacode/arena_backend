@@ -49,15 +49,22 @@ const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
 const postArenaCommentController = async (req, res) => {
     try {
         const { id: postId } = req.params;
-         const { content,type="post" } = req.body;
+         const { content,type="post",parent=null } = req.body;
          if (!mongoose.Types.ObjectId.isValid(postId)) {
              return res.status(400).json({ status: false, message: "Invalid ID" });
             }
+
+            
+            if (parent && !mongoose.Types.ObjectId.isValid(parent)) {
+                             return res.status(400).json({ status: false, message: "Invalid Parent ID" });
+            }
+
+
         const existPost = type==="post" ?  await Arena.findById(postId) : await Message.findById(postId);
         if(!existPost) return res.status(404).json({ status: false, message: "failed, post not found." });
        
         if (!content) return res.status(406).json({ status: false, message: "comment content is required" });
-        let postData = await Comment.create({ user: req["rootId"], post: postId, content });
+        let postData = await Comment.create({ user: req["rootId"], post: postId, content ,parent});
         return res.status(201).json({ status: true, message: 'success, comment posted!',data:postData });
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };

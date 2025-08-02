@@ -112,10 +112,10 @@ const getUsersController = async (req, res) => {
 
 
         return res.status(200).json({
-                status: true, message: "success", total: countData,
-                totalPages: Math.ceil(countData / limit),
-                data: usersWithImages
-            }
+            status: true, message: "success", total: countData,
+            totalPages: Math.ceil(countData / limit),
+            data: usersWithImages
+        }
         );
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
@@ -123,12 +123,12 @@ const getUsersController = async (req, res) => {
 const getByIdUserController = async (req, res) => {
     try {
         const { id } = req.params;
-         if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({ status: false, message: "Invalid user ID format" });
-    }
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ status: false, message: "Invalid user ID format" });
+        };
 
 
-        if (req["rootId"] && req["rootUser"]?.role === "user" && id !== req["rootId"]) return res.status(401).json({ status: false, message: `failed, unauthorized` });
+        // if (req["rootId"] && req["rootUser"]?.role === "user") return res.status(401).json({ status: false, message: `failed, unauthorized` });
         const findData = await User.findById(id).select("-password -__v");
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
 
@@ -149,7 +149,7 @@ const getByUsernameUserController = async (req, res) => {
     try {
         const { username } = req.params;
 
-        const findData = await User.findOne({username}).select("-password -__v");
+        const findData = await User.findOne({ username }).select("-password -__v");
         if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
 
         let presignedProfileURL = null;

@@ -49,7 +49,8 @@ const bookmarksSchema = new mongoose.Schema({
 
 const likedSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "users", index: true },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "messages", required:false },
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false,default:null },
 }, {
     timestamps: true
 });
@@ -57,8 +58,9 @@ const likedSchema = new mongoose.Schema({
 
 const commentSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: "users", index: true },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false },
-    content : {type:String, required: [true, 'comment content is required'],}
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "messages", required:false },
+    content : {type:String, required: [true, 'comment content is required'],},
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false,default:null },
 }, {
     timestamps: true
 });

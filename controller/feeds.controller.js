@@ -55,8 +55,11 @@ const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
     const isLiked = await Liked.findOne({user:req["rootId"],post:arena._id});
     arena.liked = isLiked ? true:false;
 
-    const totalLiked = await Liked.countDocuments({post:arena._id});
-    arena.like = totalLiked;
+const totalLiked = await Liked.countDocuments({ parent: arena._id });
+  arena.like =totalLiked;
+
+          const totalComment = await Comment.countDocuments({parent:arena._id});
+    arena.comments = totalComment;
 
   return arena;
 }));
@@ -66,6 +69,7 @@ const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
       message: "success",
       total: countData,
       totalPages: Math.ceil(countData / limit),
+      currentPage:page,
       data: arenaObjects
     });
   } catch (err) {
@@ -120,10 +124,10 @@ const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
     const isLiked = await Liked.findOne({user:req["rootId"],post:arena._id});
     arena.liked = isLiked ? true:false;
 
-    const totalLiked = await Liked.countDocuments({post:arena._id});
-    arena.like = totalLiked;
+const totalLiked = await Liked.countDocuments({ parent: arena._id });
+  arena.like =totalLiked;
 
-        const totalComment = await Comment.countDocuments({post:arena._id});
+        const totalComment = await Comment.countDocuments({parent:arena._id});
     arena.comments = totalComment;
 
   return arena;
