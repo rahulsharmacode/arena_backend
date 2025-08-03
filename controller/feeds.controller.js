@@ -77,14 +77,23 @@ const totalLiked = await Liked.countDocuments({ parent: arena._id });
   }
 };
 const getFeedUserController = async (req, res) => {
-  let { page = 1, limit = 10} = req.query;
+  let { page = 1, limit = 10,bookmark=null} = req.query;
   const{ id} = req.params;
   page = parseInt(page);
   limit = parseInt(limit);
   const skip = (page - 1) * limit;
 
   try {
-    let findQuery = {author:id};
+   let arenaIds = [];
+    if (bookmark === "true") {
+      const bookmarked = await Bookmarks.find({ user: req["rootId"] }).select("post");
+      arenaIds = bookmarked.map(b => b.post.toString());
+    }
+
+    let findQuery = { author: id };
+    if (bookmark === "true") {
+      findQuery = { _id: { $in: arenaIds }, author: id };
+    }
   
     const [findData, countData] = await Promise.all([
       Arena.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 })
@@ -93,7 +102,6 @@ const getFeedUserController = async (req, res) => {
       .populate("like","fullName image username"),
       Arena.countDocuments(findQuery)
     ]);
-    console.log("🚀 ~ getFeedUserController ~ findData:", findData)
 const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
   const arena = arenaDoc.toObject(); // convert to plain JS object
 

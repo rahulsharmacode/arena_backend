@@ -324,41 +324,76 @@ const patchArenaLikeController = async (req, res) => {
 const patchArenaGuestController = async (req, res) => {
   try {
     const { id } = req.params;
-    const findData = await Arena.findById(id);
-    if (!findData) return res.status(404).json({ status: false, message: `failed, data not found` });
-    // if(req["rootId"]&& req["rootUser"]?.role==="user"&& !findData.author.equals(req["rootId"])) return res.status(401).json({ status: false, message: `failed, unauthorized` });
-    req.body = !findData.guest ? {
-      guest: req["rootId"],
-      ...req.body
-    } : req.body;
-    Object.assign(findData, req.body);
-    await findData.save();
 
-     // Send Notification
-     const topic = findData?.topics[findData?.mainTopicIndex]
+    const arena = await Arena.findById(id);
+    if (!arena) {
+      return res.status(404).json({ status: false, message: "Event not found" });
+    }
+
+    // Check if user is trying to set eventStatus to "open"
+    const isTryingToAccept = req.body?.eventStatus === "open";
+
+    if (isTryingToAccept) {
+      // Fetch guest user's profile
+      const user = await User.findById(req["rootId"]);
+
+      // Gather verification checks required by arena
+      const requiredVerifications = [];
+
+      if (arena.isXVerified) requiredVerifications.push("isXVerified");
+      if (arena.isLinkedinVerified) requiredVerifications.push("isLinkedinVerified");
+      if (arena.isFacebookVerified) requiredVerifications.push("isFacebookVerified");
+      if (arena.isInstagramVerified) requiredVerifications.push("isInstagramVerified");
+      if (arena.isYoutubeVerified) requiredVerifications.push("isYoutubeVerified");
+      if (arena.isTiktokVerified) requiredVerifications.push("isTiktokVerified");
+
+      // Check for missing verifications in user's profile
+      const missing = requiredVerifications.filter((key) => !user[key]);
+
+      if (missing.length > 0) {
+        return res.status(403).json({
+          status: false,
+          message: `You must verify your social accounts before accepting this event: ${missing.join(", ")}`,
+        });
+      }
+    }
+
+    // Assign guest if not already set
+    if (!arena.guest) {
+      req.body.guest = req["rootId"];
+    }
+
+    // Update arena fields
+    Object.assign(arena, req.body);
+    await arena.save();
+
+    // Prepare notification
+    const topic = arena?.topics[arena?.mainTopicIndex];
+
     await Notification.insertMany([
       {
-        title: `Event status changes`,
-        content: `Event status for (${topic}) updated to ${findData?.eventStatus}`,
+        title: `Event status changed`,
+        content: `Event status for (${topic}) updated to ${arena.eventStatus}`,
         to: req["rootId"],
         event: id,
-        redirect : `http://${req.headers.host}/text/${id}`
+        redirect: `http://${req.headers.host}/text/${id}`,
       },
-   {
-        title: `Event Invitation ${findData?.eventStatus==="open" ? "Accepted" : findData?.eventStatus}`,
-        content: `Event status for (${topic}) updated to ${findData?.eventStatus}`,
-        to: findData?.author?._id,
-        from:req["rootId"],
+      {
+        title: `Event Invitation ${arena.eventStatus === "open" ? "Accepted" : arena.eventStatus}`,
+        content: `Event status for (${topic}) updated to ${arena.eventStatus}`,
+        to: arena.author,
+        from: req["rootId"],
         event: id,
-        redirect : `http://${req.headers.host}/text/${id}`
-      }
+        redirect: `http://${req.headers.host}/text/${id}`,
+      },
     ]);
 
-
-    return res.status(200).json({ status: true, message: "success", data: findData });
+    return res.status(200).json({ status: true, message: "Success", data: arena });
+  } catch (err) {
+    return res.status(500).json({ status: false, error: err.message });
   }
-  catch (err) { return res.status(500).json({ status: false, error: err }) };
 };
+
 
 const deleteArenaController = async (req, res) => {
   try {

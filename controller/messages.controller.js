@@ -5,8 +5,8 @@ const { Message } = require("../schema/messages.schema");
 
 
 const getArenaMessagesController = async (req, res) => {
-  let { page = 1, limit = 10,topic=""} = req.query;
-  const {roomId} = req.params;
+  let { page = 1, limit = 10, topic = "" } = req.query;
+  const { roomId } = req.params;
   page = parseInt(page);
   limit = parseInt(limit);
   const skip = (page - 1) * limit;
@@ -24,27 +24,27 @@ const getArenaMessagesController = async (req, res) => {
 
     const [findData, countData] = await Promise.all([
       Message.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 })
-     ,
+      ,
       Message.countDocuments(findQuery)
     ]);
 
     const arenaObjects = await Promise.all(findData.map(async (arenaDoc) => {
       const arena = arenaDoc.toObject(); // convert to plain JS object
-    
+
       // Process author
       if (arena.file?.s3Key) {
         arena.file.url = await generatePresignedUrl(arena.file.s3Key);
       }
-    
-          const isLiked = await Liked.findOne({user:req["rootId"],post:arena._id});
-          arena.liked = isLiked ? true:false;
-      
-          const totalLiked = await Liked.countDocuments({post:arena._id});
-          arena.like = totalLiked;
 
-          
-                  const totalComment = await Comment.countDocuments({post:arena._id});
-              arena.comments = totalComment;
+      const isLiked = await Liked.findOne({ user: req["rootId"], post: arena._id });
+      arena.liked = isLiked ? true : false;
+
+      const totalLiked = await Liked.countDocuments({ post: arena._id });
+      arena.like = totalLiked;
+
+
+      const totalComment = await Comment.countDocuments({ post: arena._id });
+      arena.comments = totalComment;
 
       return arena;
     }));
@@ -54,6 +54,7 @@ const getArenaMessagesController = async (req, res) => {
       message: "success",
       total: countData,
       totalPages: Math.ceil(countData / limit),
+      currentPage: page,
       data: arenaObjects
     });
   } catch (err) {
@@ -63,5 +64,5 @@ const getArenaMessagesController = async (req, res) => {
 
 
 module.exports = {
-    getArenaMessagesController
+  getArenaMessagesController
 }
