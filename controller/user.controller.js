@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 const { sendTemplateEmail } = require("../helper/mail.function");
 const { generatePresignedUrl } = require("../helper/s3.function");
 const { Otp } = require("../schema/otp.schema");
-const { User } = require("../schema/user.schema");
+const { User, Follow } = require("../schema/user.schema");
 const bcrypt = require("bcrypt");
 
 const getUserController = async (req, res) => {
@@ -161,7 +161,12 @@ const getByUsernameUserController = async (req, res) => {
                 presignedProfileURL = 'Error generating image URL.';
             }
         }
-        return res.status(200).json({ status: true, message: "success", data: { ...findData.toObject(), image: presignedProfileURL } });
+
+        const follower = await Follow.countDocuments({following:findData?._id});
+        const following = await Follow.countDocuments({follower:findData?._id});
+        const isFollowed = await Follow.findOne({follower:req["rootId"]})
+
+        return res.status(200).json({ status: true, message: "success", data: { ...findData.toObject(),follower,following,isFollowed:isFollowed?true:false, image: presignedProfileURL } });
     }
     catch (err) { return res.status(500).json({ status: false, error: err }) };
 };

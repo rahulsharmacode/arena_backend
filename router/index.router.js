@@ -24,6 +24,8 @@ const { getArenaMessagesController } = require("../controller/messages.controlle
 const { getFeedController, getFeedUserController } = require("../controller/feeds.controller");
 const { postArenaCommentController, patchArenaCommentController, deleteArenaCommentController, getArenaCommentController } = require("../controller/comment.controller");
 const { getNotificationController, patchNotificationController, deleteNotificationController, patchNotificationReadAllController } = require("../controller/notification.controller");
+const { getFollowController, postFollowController } = require("../controller/follow.controller");
+const { postArenaViewController } = require("../controller/views.controller");
 // ============================ auth routes ============================ //
 userRouter.route('/auth/login')
   .post(loginController);
@@ -83,11 +85,23 @@ userRouter.route('/arena/:id')
   .delete(auth, deleteArenaCommentController)
 
 
+  // ============================ arena views ============================ //
+  userRouter.route('/arena/view/:id')
+  .post(auth, postArenaViewController)
+
 // ============================ home feeds routes ============================ //
 userRouter.route('/feeds')
   .get(auth, getFeedController)
   userRouter.route('/feeds/user/:id')
   .get(auth, getFeedUserController)
+
+
+
+  // ============================ follow/following routes ============================ //
+userRouter.route('/follows/:userId')
+  .get(auth, getFollowController)
+  userRouter.route('/follows/:userId')
+  .post(auth, postFollowController)
 
 
   // ============================ messages routes ============================ //

@@ -55,8 +55,19 @@ const userSchema = new mongoose.Schema({
     timestamps:true
 });
 
+
+const followSchema = new mongoose.Schema({
+    follower: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
+    following: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
+}, {
+    timestamps:true
+});
+
 const User = mongoose.model("users",userSchema);
+const Follow = mongoose.model("follows",followSchema);
+
 module.exports = {
-    User
+    User,
+    Follow
 };
 

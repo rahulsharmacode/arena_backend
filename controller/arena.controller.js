@@ -5,6 +5,7 @@ const { Category } = require("../schema/category.schema");
 const { generatePresignedUrl } = require("../helper/s3.function");
 const { default: mongoose } = require("mongoose");
 const { Notification } = require("../schema/notification.schema");
+const { Message } = require("../schema/messages.schema");
 
 const getArenaController = async (req, res) => {
   let { page = 1, limit = 10, search = "", eventStatus = "open" } = req.query;
@@ -306,15 +307,43 @@ const patchArenaLikeController = async (req, res) => {
     if (parent && !mongoose.Types.ObjectId.isValid(parent)) {
       return res.status(400).json({ status: false, message: "Invalid Parent ID" });
     }
+
+    const findPost = parent && await Arena.findById(postId)
     const existing = await Liked.findOne({ user: req["rootId"], post: postId });
 
     if (existing) {
-      // Remove bookmark
+      // Remove likeda
       await existing.deleteOne();
       return res.status(200).json({ status: true, message: 'like removed' });
     } else {
-      // Add bookmark
+      // Add likeda
       await Liked.create({ user: req["rootId"], post: postId, parent });
+        // Send Notification
+  
+     parent && await Notification.insertMany([
+      {
+        title: `${ req["rootId"]==findPost.author._id ? "You have" :  `${req["rootUser"]?.fullName} has`||""} liked`,
+        content: ` ${req["rootId"]==findPost.author._id ? "You have" :req["rootUser"]?.fullName||""} (${ findPost.isNewDiscussion ? findPost.content :  findPost.topics[findPost.mainTopicIndex]}) liked your ${ findPost.isNewDiscussion ?  "post" : "event"}`,
+        to: findPost.author._id,
+        event: parent,
+        redirect : `http://${req.headers.host}/text/${parent}`
+      },
+     ...(findPost?.guest ? [{
+        title: `${req["rootUser"]?.fullName||""} has liked`,
+        content: `${req["rootUser"]?.fullName||""} (${findPost.topics[findPost.mainTopicIndex]}) liked your event`,
+        to: findPost.guest._id,
+        event: parent,
+        redirect : `http://${req.headers.host}/text/${parent}`
+      }] : [] ),
+      // ...(guest ? [{
+      //   title: `Event Invitation`,
+      //   content: `You have been invited to (${topics[req.body.mainTopicIndex]}) event`,
+      //   to: guest,
+      //   from:req["rootId"],
+      //   event: saveData._id,
+      //   redirect : `http://${req.headers.host}/text/${saveData._id}`
+      // }] : [])
+    ]);
       return res.status(201).json({ status: true, message: 'liked' });
     }
   }

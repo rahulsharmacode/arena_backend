@@ -65,10 +65,21 @@ const commentSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
+const viewSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "users", index: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "messages", required:false },
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "arenas", required:false,default:null },
+}, {
+    timestamps: true
+});
+
 const Arena = mongoose.model("arenas", arenaSchema);
 const Bookmarks = mongoose.model("bookmarks", bookmarksSchema);
 const Liked = mongoose.model("likes", likedSchema);
 const Comment = mongoose.model("comments", commentSchema);
+const View = mongoose.model("views", viewSchema);
 
 
-module.exports = { Arena,Bookmarks,Liked,Comment };
+
+module.exports = { Arena,Bookmarks,Liked,Comment,View };

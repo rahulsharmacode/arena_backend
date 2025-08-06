@@ -46,7 +46,7 @@ const getNotificationController = async (req, res) => {
     }
 
     const [findData, countData,unReadData] = await Promise.all([
-      Notification.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("event","eventStatus guestName"),
+      Notification.find(findQuery).skip(skip).limit(limit).sort({ createdAt: -1 }).populate("event","eventStatus guestName isNewDiscussion"),
       Notification.countDocuments(findQuery),
     Notification.countDocuments({ isRead: false, to:req["rootId"] })
 

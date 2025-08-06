@@ -1,5 +1,5 @@
 const { generatePresignedUrl } = require("../helper/s3.function");
-const { Liked, Comment } = require("../schema/arena.schema");
+const { Liked, Comment, View } = require("../schema/arena.schema");
 const { Message } = require("../schema/messages.schema");
 
 
@@ -41,6 +41,12 @@ const getArenaMessagesController = async (req, res) => {
 
       const totalLiked = await Liked.countDocuments({ post: arena._id });
       arena.like = totalLiked;
+
+                 const isViewed = await View.findOne({ user: req["rootId"], post: arena._id });
+            arena.viewed = isViewed ? true : false;
+      
+            const totalViews = await View.countDocuments({ post: arena._id });
+            arena.view = totalViews;
 
 
       const totalComment = await Comment.countDocuments({ post: arena._id });
